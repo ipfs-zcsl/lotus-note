@@ -16,6 +16,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"contrib.go.opencensus.io/exporter/prometheus"
+	gopro "github.com/prometheus/client_golang/prometheus"
 
 	"github.com/filecoin-project/go-jsonrpc"
 	"github.com/filecoin-project/go-jsonrpc/auth"
@@ -48,6 +49,7 @@ func serveRPC(a api.FullNode, stop node.StopFunc, addr multiaddr.Multiaddr, shut
 
 	exporter, err := prometheus.NewExporter(prometheus.Options{
 		Namespace: "lotus",
+		Registry:  gopro.DefaultRegisterer.(*gopro.Registry),
 	})
 	if err != nil {
 		log.Fatalf("could not create the prometheus stats exporter: %v", err)

@@ -55,7 +55,7 @@ require (
 	github.com/ipfs/go-datastore v0.4.4
 	github.com/ipfs/go-ds-badger2 v0.1.1-0.20200708190120-187fc06f714e
 	github.com/ipfs/go-ds-leveldb v0.4.2
-	github.com/ipfs/go-ds-measure v0.1.0
+	github.com/ipfs/go-ds-measure v0.1.1-0.20200804200725-d3b0d2d9a8bd
 	github.com/ipfs/go-filestore v1.0.0
 	github.com/ipfs/go-fs-lock v0.0.1
 	github.com/ipfs/go-graphsync v0.1.0
@@ -72,6 +72,7 @@ require (
 	github.com/ipfs/go-log v1.0.4
 	github.com/ipfs/go-log/v2 v2.1.2-0.20200626104915-0016c0b4b3e4
 	github.com/ipfs/go-merkledag v0.3.1
+	github.com/ipfs/go-metrics-prometheus v0.0.2
 	github.com/ipfs/go-path v0.0.7
 	github.com/ipfs/go-unixfs v0.2.4
 	github.com/ipfs/interface-go-ipfs-core v0.2.3

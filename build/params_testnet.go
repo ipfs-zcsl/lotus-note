@@ -16,10 +16,11 @@ const UpgradeBreezeHeight = 41280
 const BreezeGasTampingDuration = 120
 
 func init() {
-	power.ConsensusMinerMinPower = big.NewInt(10 << 40)
+	power.ConsensusMinerMinPower = big.NewInt(1024 << 20)
 	miner.SupportedProofTypes = map[abi.RegisteredSealProof]struct{}{
-		abi.RegisteredSealProof_StackedDrg32GiBV1: {},
-		abi.RegisteredSealProof_StackedDrg64GiBV1: {},
+		abi.RegisteredSealProof_StackedDrg512MiBV1: {},
+		abi.RegisteredSealProof_StackedDrg32GiBV1:  {},
+		abi.RegisteredSealProof_StackedDrg64GiBV1:  {},
 	}
 }
 

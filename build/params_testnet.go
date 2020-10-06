@@ -16,15 +16,15 @@ var DrandSchedule = map[abi.ChainEpoch]DrandEnum{
 	UpgradeSmokeHeight: DrandMainnet,
 }
 
-const UpgradeBreezeHeight = 41280
+const UpgradeBreezeHeight = -1
 const BreezeGasTampingDuration = 120
 
-const UpgradeSmokeHeight = 51000
+const UpgradeSmokeHeight = -1
 
-const UpgradeIgnitionHeight = 94000
+const UpgradeIgnitionHeight = -1
 
 // TODO: Actual epoch needs to be filled in
-const UpgradeActorsV2Height = 128888
+const UpgradeActorsV2Height = 0
 
 // This signals our tentative epoch for mainnet launch. Can make it later, but not earlier.
 // Miners, clients, developers, custodians all need time to prepare.

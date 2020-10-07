@@ -27,6 +27,7 @@ import (
 	"github.com/filecoin-project/lotus/build"
 	"github.com/filecoin-project/lotus/chain/actors"
 	"github.com/filecoin-project/lotus/chain/actors/adt"
+	"github.com/filecoin-project/lotus/chain/actors/builtin"
 	init_ "github.com/filecoin-project/lotus/chain/actors/builtin/init"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/multisig"
 	"github.com/filecoin-project/lotus/chain/state"
@@ -59,6 +60,10 @@ func DefaultUpgradeSchedule() UpgradeSchedule {
 		Height:    build.UpgradeIgnitionHeight,
 		Network:   network.Version3,
 		Migration: UpgradeIgnition,
+	}, {
+		Height:    build.UpgradeRefuelHeight,
+		Network:   network.Version3,
+		Migration: UpgradeRefuel,
 	}, {
 		Height:    build.UpgradeActorsV2Height,
 		Network:   network.Version4,
@@ -484,6 +489,46 @@ func UpgradeIgnition(ctx context.Context, sm *StateManager, cb ExecCallback, roo
 	err = nv3.CheckStateTree(ctx, store, nst, epoch, builtin0.TotalFilecoin)
 	if err != nil {
 		return cid.Undef, xerrors.Errorf("sanity check after ignition upgrade failed: %w", err)
+	}
+
+	return tree.Flush(ctx)
+}
+
+func UpgradeRefuel(ctx context.Context, sm *StateManager, cb ExecCallback, root cid.Cid, ts *types.TipSet) (cid.Cid, error) {
+	store := sm.cs.Store(ctx)
+	tree, err := sm.StateTree(root)
+	if err != nil {
+		return cid.Undef, xerrors.Errorf("getting state tree: %w", err)
+	}
+
+	addr, err := address.NewFromString("t0122")
+	if err != nil {
+		return cid.Undef, xerrors.Errorf("getting address: %w", err)
+	}
+
+	act, err := tree.GetActor(addr)
+	if err != nil {
+		return cid.Undef, xerrors.Errorf("getting actor: %w", err)
+	}
+
+	if !builtin.IsMultisigActor(act.Code) {
+		return cid.Undef, xerrors.Errorf("actor wasn't msig: %w", err)
+	}
+
+	var msigState multisig0.State
+	if err := store.Get(ctx, act.Head, &msigState); err != nil {
+		return cid.Undef, xerrors.Errorf("reading multisig state: %w", err)
+	}
+
+	msigState.StartEpoch = 0
+
+	act.Head, err = store.Put(ctx, &msigState)
+	if err != nil {
+		return cid.Undef, xerrors.Errorf("writing new multisig state: %w", err)
+	}
+
+	if err := tree.SetActor(addr, act); err != nil {
+		return cid.Undef, xerrors.Errorf("setting multisig actor: %w", err)
 	}
 
 	return tree.Flush(ctx)

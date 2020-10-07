@@ -24,6 +24,9 @@ const UpgradeSmokeHeight = 51000
 
 const UpgradeIgnitionHeight = 94000
 
+// TODO:
+const UpgradeRefuelHeight = 128700
+
 // TODO: Actual epoch needs to be filled in
 const UpgradeActorsV2Height = 128888
 

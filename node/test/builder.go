@@ -103,8 +103,7 @@ func CreateTestStorageNode(ctx context.Context, t *testing.T, waddr address.Addr
 	var minerapi api.StorageMiner
 
 	mineBlock := make(chan lotusminer.MineReq)
-	// TODO: use stop
-	_, err = node.New(ctx,
+	stop, err := node.New(ctx,
 		node.StorageMiner(&minerapi),
 		node.Online(),
 		node.Repo(r),
@@ -120,6 +119,7 @@ func CreateTestStorageNode(ctx context.Context, t *testing.T, waddr address.Addr
 	if err != nil {
 		t.Fatalf("failed to construct node: %v", err)
 	}
+	t.Cleanup(func() { _ = stop(context.Background()) })
 
 	/*// Bootstrap with full node
 	remoteAddrs, err := tnd.NetAddrsListen(ctx)
@@ -140,7 +140,9 @@ func CreateTestStorageNode(ctx context.Context, t *testing.T, waddr address.Addr
 }
 
 func Builder(t *testing.T, nFull int, storage []test.StorageMiner, opts ...node.Option) ([]test.TestNode, []test.TestStorageNode) {
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
+	t.Cleanup(cancel)
+
 	mn := mocknet.New(ctx)
 
 	fulls := make([]test.TestNode, nFull)
@@ -216,9 +218,7 @@ func Builder(t *testing.T, nFull int, storage []test.StorageMiner, opts ...node.
 			genesis = node.Override(new(modules.Genesis), modules.LoadGenesis(genbuf.Bytes()))
 		}
 
-		var err error
-		// TODO: Don't ignore stop
-		_, err = node.New(ctx,
+		stop, err := node.New(ctx,
 			node.FullAPI(&fulls[i].FullNode),
 			node.Online(),
 			node.Repo(repo.NewMemory(nil)),
@@ -237,7 +237,7 @@ func Builder(t *testing.T, nFull int, storage []test.StorageMiner, opts ...node.
 		if err != nil {
 			t.Fatal(err)
 		}
-
+		t.Cleanup(func() { _ = stop(context.Background()) })
 	}
 
 	for i, def := range storage {
@@ -372,7 +372,7 @@ func MockSbBuilder(t *testing.T, nFull int, storage []test.StorageMiner, options
 
 		var err error
 		// TODO: Don't ignore stop
-		_, err = node.New(ctx,
+		stop, err := node.New(ctx,
 			node.FullAPI(&fulls[i].FullNode),
 			node.Online(),
 			node.Repo(repo.NewMemory(nil)),
@@ -393,6 +393,7 @@ func MockSbBuilder(t *testing.T, nFull int, storage []test.StorageMiner, options
 		if err != nil {
 			t.Fatalf("%+v", err)
 		}
+		t.Cleanup(func() { _ = stop(context.Background()) })
 	}
 
 	for i, def := range storage {

@@ -25,6 +25,7 @@ import (
 	"github.com/filecoin-project/lotus/chain/actors/policy"
 	"github.com/filecoin-project/lotus/chain/gen"
 	genesis2 "github.com/filecoin-project/lotus/chain/gen/genesis"
+	"github.com/filecoin-project/lotus/chain/stmgr"
 	"github.com/filecoin-project/lotus/chain/types"
 	"github.com/filecoin-project/lotus/chain/wallet"
 	"github.com/filecoin-project/lotus/cmd/lotus-seed/seed"
@@ -225,6 +226,12 @@ func Builder(t *testing.T, nFull int, storage []test.StorageMiner, opts ...node.
 			node.Test(),
 
 			genesis,
+			// upgrade at height 0 by default.
+			node.Override(new(stmgr.UpgradeSchedule), stmgr.UpgradeSchedule{{
+				Network:   build.ActorUpgradeNetworkVersion,
+				Height:    0,
+				Migration: stmgr.UpgradeActorsV2,
+			}}),
 			node.Options(opts...),
 		)
 		if err != nil {
@@ -375,6 +382,12 @@ func MockSbBuilder(t *testing.T, nFull int, storage []test.StorageMiner, options
 			node.Override(new(ffiwrapper.Verifier), mock.MockVerifier),
 
 			genesis,
+			// upgrade at height 0 by default.
+			node.Override(new(stmgr.UpgradeSchedule), stmgr.UpgradeSchedule{{
+				Network:   build.ActorUpgradeNetworkVersion,
+				Height:    0,
+				Migration: stmgr.UpgradeActorsV2,
+			}}),
 			node.Options(options...),
 		)
 		if err != nil {

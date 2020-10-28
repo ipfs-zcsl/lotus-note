@@ -513,7 +513,7 @@ func (s *WindowPoStScheduler) runPost(ctx context.Context, di dline.Info, ts *ty
 		var postOut []proof2.PoStProof
 		somethingToProve := true
 
-		for retries := 0; retries < 5; retries++ {
+		for retries := 0; retries < 100; retries++ {
 			var partitions []miner.PoStPartition
 			var sinfos []proof2.SectorInfo
 			for partIdx, partition := range batch {

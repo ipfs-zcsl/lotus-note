@@ -38,8 +38,8 @@ const UpgradeLiftoffHeight = -5
 const UpgradeKumquatHeight = 90
 
 // TODO: Height??
-const UpgradeCalicoHeight = 999999
-const UpgradePersianHeight = UpgradeCalicoHeight + (builtin2.EpochsInDay * 2)
+const UpgradeCalicoHeight = 120
+const UpgradePersianHeight = 180
 
 func init() {
 	policy.SetConsensusMinerMinPower(abi.NewStoragePower(10 << 30))

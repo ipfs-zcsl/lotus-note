@@ -1341,6 +1341,7 @@ func (sm *StateManager) GetNtwkVersion(ctx context.Context, height abi.ChainEpoc
 	// version is disabled.
 	for _, spec := range sm.networkVersions {
 		if height <= spec.atOrBelow {
+			fmt.Println("matching entry is ", spec.networkVersion, spec.atOrBelow)
 			return spec.networkVersion
 		}
 	}

@@ -5,7 +5,6 @@
 package build
 
 import (
-	"math"
 	"os"
 
 	"github.com/filecoin-project/go-address"
@@ -50,10 +49,6 @@ func init() {
 	)
 	if os.Getenv("LOTUS_USE_TEST_ADDRESSES") != "1" {
 		SetAddressNetwork(address.Mainnet)
-	}
-
-	if os.Getenv("LOTUS_DISABLE_V2_ACTOR_MIGRATION") == "1" {
-		UpgradeActorsV2Height = math.MaxInt64
 	}
 
 	Devnet = true

@@ -191,7 +191,7 @@ var stateTreePruneCmd = &cli.Command{
 
 		rrLb := abi.ChainEpoch(cctx.Int64("keep-from-lookback"))
 
-		if err := cs.WalkSnapshot(ctx, ts, rrLb, true, func(c cid.Cid) error {
+		if err := cs.WalkSnapshot(ctx, ts, rrLb, true, true, func(c cid.Cid) error {
 			if goodSet.Len()%20 == 0 {
 				fmt.Printf("\renumerating keep set: %d             ", goodSet.Len())
 			}

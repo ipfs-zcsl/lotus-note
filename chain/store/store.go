@@ -1340,7 +1340,7 @@ func (cs *ChainStore) Export(ctx context.Context, ts *types.TipSet, inclRecentRo
 		return xerrors.Errorf("failed to write car header: %s", err)
 	}
 
-	return cs.WalkSnapshot(ctx, ts, inclRecentRoots, skipOldMsgs, func(c cid.Cid) error {
+	return cs.WalkSnapshot(ctx, ts, inclRecentRoots, skipOldMsgs, true, func(c cid.Cid) error {
 		blk, err := cs.chainBlockstore.Get(c)
 		if err != nil {
 			return xerrors.Errorf("writing object to car, bs.Get: %w", err)
@@ -1354,7 +1354,7 @@ func (cs *ChainStore) Export(ctx context.Context, ts *types.TipSet, inclRecentRo
 	})
 }
 
-func (cs *ChainStore) WalkSnapshot(ctx context.Context, ts *types.TipSet, inclRecentRoots abi.ChainEpoch, skipOldMsgs bool, cb func(cid.Cid) error) error {
+func (cs *ChainStore) WalkSnapshot(ctx context.Context, ts *types.TipSet, inclRecentRoots abi.ChainEpoch, skipOldMsgs, skipMsgReceipts bool, cb func(cid.Cid) error) error {
 	if ts == nil {
 		ts = cs.GetHeaviestTipSet()
 	}
@@ -1421,6 +1421,10 @@ func (cs *ChainStore) WalkSnapshot(ctx context.Context, ts *types.TipSet, inclRe
 				}
 
 				out = append(out, cids...)
+			}
+
+			if !skipMsgReceipts && walked.Visit(b.ParentMessageReceipts) {
+				out = append(out, b.ParentMessageReceipts)
 			}
 		}
 

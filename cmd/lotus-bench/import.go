@@ -203,7 +203,7 @@ var importBenchCmd = &cli.Command{
 		case cctx.Bool("use-native-badger"):
 			log.Info("using native badger")
 			var opts badgerbs.Options
-			if opts, err = repo.BadgerBlockstoreOptions(repo.BlockstoreMonolith, tdir, false); err != nil {
+			if opts, err = repo.BadgerBlockstoreOptions(repo.ColdBlockstore, tdir, false); err != nil {
 				return err
 			}
 			opts.SyncWrites = false

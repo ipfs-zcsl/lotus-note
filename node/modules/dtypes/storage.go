@@ -24,9 +24,11 @@ import (
 type MetadataDS datastore.Batching
 
 type (
-	// BareMonolithBlockstore is the current monolithic blockstore as opened from
-	// the filesystem, with no caching on top.
-	BareMonolithBlockstore blockstore.Blockstore
+	// ColdBlockstore is the cold blockstore.
+	ColdBlockstore blockstore.Blockstore
+
+	// SplitBlockstore is the hot/cold blockstore that sits on top of the ColdBlockstore.
+	SplitBlockstore blockstore.Blockstore
 
 	// ChainBlockstore is a blockstore to store chain data (tipsets, blocks,
 	// messages). It is physically backed by the BareMonolithBlockstore, but it

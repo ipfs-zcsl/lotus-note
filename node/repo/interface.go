@@ -21,7 +21,7 @@ const (
 	// Right now, this includes chain objects (tipsets, blocks, messages), as
 	// well as state. In the future, they may get segregated into different
 	// domains.
-	BlockstoreMonolith = BlockstoreDomain("monolith")
+	ColdBlockstore = BlockstoreDomain("cold")
 )
 
 var (
@@ -55,6 +55,9 @@ type LockedRepo interface {
 
 	// Blockstore returns an IPLD blockstore for the requested domain.
 	Blockstore(domain BlockstoreDomain) (blockstore.Blockstore, error)
+
+	// SplitstorePath returns the path for the SplitStore
+	SplitstorePath() (string, error)
 
 	// Returns config in this repo
 	Config() (interface{}, error)

@@ -245,10 +245,14 @@ func (lmem *lockedMemRepo) Datastore(ns string) (datastore.Batching, error) {
 }
 
 func (lmem *lockedMemRepo) Blockstore(domain BlockstoreDomain) (blockstore.Blockstore, error) {
-	if domain != BlockstoreMonolith {
+	if domain != ColdBlockstore {
 		return nil, ErrInvalidBlockstoreDomain
 	}
 	return lmem.mem.blockstore, nil
+}
+
+func (lmem *lockedMemRepo) SplitstorePath() (string, error) {
+	return "/tmp", nil
 }
 
 func (lmem *lockedMemRepo) ListDatastores(ns string) ([]int64, error) {

@@ -8,17 +8,17 @@ import (
 	"go.uber.org/fx"
 	"golang.org/x/xerrors"
 
+	"github.com/filecoin-project/lotus/chain/store/splitstore"
 	"github.com/filecoin-project/lotus/lib/blockstore"
 	"github.com/filecoin-project/lotus/node/modules/dtypes"
 	"github.com/filecoin-project/lotus/node/modules/helpers"
 	"github.com/filecoin-project/lotus/node/repo"
 )
 
-// BareMonolithBlockstore returns a bare local blockstore for chain and state
-// data, with direct access. In the future, both data domains may be segregated
-// into individual blockstores.
-func BareMonolithBlockstore(lc fx.Lifecycle, r repo.LockedRepo) (dtypes.BareMonolithBlockstore, error) {
-	bs, err := r.Blockstore(repo.BlockstoreMonolith)
+// ColdBlockstore returns a bare local cold blockstore for chain and state
+// data.
+func ColdBlockstore(lc fx.Lifecycle, r repo.LockedRepo) (dtypes.ColdBlockstore, error) {
+	bs, err := r.Blockstore(repo.ColdBlockstore)
 	if err != nil {
 		return nil, err
 	}
@@ -32,8 +32,27 @@ func BareMonolithBlockstore(lc fx.Lifecycle, r repo.LockedRepo) (dtypes.BareMono
 	return bs, err
 }
 
+func SplitBlockstore(lc fx.Lifecycle, r repo.LockedRepo, ds dtypes.MetadataDS, bs dtypes.ColdBlockstore) (dtypes.SplitBlockstore, error) {
+	path, err := r.SplitstorePath()
+	if err != nil {
+		return nil, err
+	}
+
+	ss, err := splitstore.NewSplitStore(path, ds, bs)
+	if err != nil {
+		return nil, err
+	}
+	lc.Append(fx.Hook{
+		OnStop: func(context.Context) error {
+			return ss.Close()
+		},
+	})
+
+	return ss, err
+}
+
 // StateBlockstore returns the blockstore to use to store the state tree.
-func StateBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.BareMonolithBlockstore) (dtypes.StateBlockstore, error) {
+func StateBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.SplitBlockstore) (dtypes.StateBlockstore, error) {
 	sbs, err := blockstore.WrapFreecacheCache(helpers.LifecycleCtx(mctx, lc), bs, blockstore.FreecacheConfig{
 		Name:           "state",
 		BlockCapacity:  288 * 1024 * 1024, // 288MiB.
@@ -52,7 +71,7 @@ func StateBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.BareMon
 }
 
 // ChainBlockstore returns the blockstore to use for chain data (tipsets, blocks, messages).
-func ChainBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.BareMonolithBlockstore) (dtypes.ChainBlockstore, error) {
+func ChainBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.SplitBlockstore) (dtypes.ChainBlockstore, error) {
 	cbs, err := blockstore.WrapFreecacheCache(helpers.LifecycleCtx(mctx, lc), bs, blockstore.FreecacheConfig{
 		Name:           "chain",
 		BlockCapacity:  64 * 1024 * 1024, // 64MiB.

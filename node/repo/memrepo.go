@@ -252,7 +252,7 @@ func (lmem *lockedMemRepo) Blockstore(domain BlockstoreDomain) (blockstore.Block
 }
 
 func (lmem *lockedMemRepo) SplitstorePath() (string, error) {
-	return "/tmp", nil
+	return ioutil.TempDir("", "splitstore.*")
 }
 
 func (lmem *lockedMemRepo) ListDatastores(ns string) ([]int64, error) {

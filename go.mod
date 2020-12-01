@@ -27,6 +27,7 @@ require (
 	github.com/filecoin-project/go-address v0.0.5-0.20201103152444-f2023ef3f5bb
 	github.com/filecoin-project/go-amt-ipld/v2 v2.1.1-0.20201006184820-924ee87a1349 // indirect
 	github.com/filecoin-project/go-bitfield v0.2.3-0.20201110211213-fe2c1862e816
+	github.com/filecoin-project/go-bs-lmdb v0.0.2
 	github.com/filecoin-project/go-cbor-util v0.0.0-20191219014500-08c40a1e63a2
 	github.com/filecoin-project/go-commp-utils v0.0.0-20201119054358-b88f7a96a434
 	github.com/filecoin-project/go-crypto v0.0.0-20191218222705-effae4ea9f03
@@ -141,7 +142,7 @@ require (
 	go.uber.org/zap v1.16.0
 	golang.org/x/net v0.0.0-20201021035429-f5854403a974
 	golang.org/x/sync v0.0.0-20201020160332-67f06af15bc9
-	golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f
+	golang.org/x/sys v0.0.0-20201119102817-f84b799fce68
 	golang.org/x/time v0.0.0-20191024005414-555d28b269f0
 	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1
 	gopkg.in/cheggaaa/pb.v1 v1.0.28

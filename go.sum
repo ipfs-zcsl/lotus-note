@@ -245,6 +245,8 @@ github.com/filecoin-project/go-bitfield v0.2.0 h1:gCtLcjskIPtdg4NfN7gQZSQF9yrBQ7
 github.com/filecoin-project/go-bitfield v0.2.0/go.mod h1:CNl9WG8hgR5mttCnUErjcQjGvuiZjRqK9rHVBsQF4oM=
 github.com/filecoin-project/go-bitfield v0.2.3-0.20201110211213-fe2c1862e816 h1:RMdzMqe3mu2Z/3N3b9UEfkbGZxukstmZgNC024ybWhA=
 github.com/filecoin-project/go-bitfield v0.2.3-0.20201110211213-fe2c1862e816/go.mod h1:CNl9WG8hgR5mttCnUErjcQjGvuiZjRqK9rHVBsQF4oM=
+github.com/filecoin-project/go-bs-lmdb v0.0.2 h1:FeHjg3B0TPcVUVYyykNrfMaRujZr0aN14CxWGv3feXo=
+github.com/filecoin-project/go-bs-lmdb v0.0.2/go.mod h1:Rt1cAcl80csj0aEvISab9g7r8PEqTdZGDnCaOR3tjFw=
 github.com/filecoin-project/go-cbor-util v0.0.0-20191219014500-08c40a1e63a2 h1:av5fw6wmm58FYMgJeoB/lK9XXrgdugYiTqkdxjTy9k8=
 github.com/filecoin-project/go-cbor-util v0.0.0-20191219014500-08c40a1e63a2/go.mod h1:pqTiPHobNkOVM5thSRsHYjyQfq7O5QSCMhvuu9JoDlg=
 github.com/filecoin-project/go-commp-utils v0.0.0-20201119054358-b88f7a96a434 h1:0kHszkYP3hgApcjl5x4rpwONhN9+j7XDobf6at5XfHs=
@@ -1339,6 +1341,7 @@ github.com/raulk/clock v1.1.0 h1:dpb29+UKMbLqiU/jqIJptgLR1nn23HLgMY0sTCDza5Y=
 github.com/raulk/clock v1.1.0/go.mod h1:3MpVxdZ/ODBQDxbN+kzshf5OSZwPjtMDx6BBXBmOeY0=
 github.com/raulk/freecache v1.2.0 h1:1HDmZsDi+zvFe1/vMLkdrX9ThWdXQsIp4btrGJ824yc=
 github.com/raulk/freecache v1.2.0/go.mod h1:Ixh8xigQnoxRDvSTzugeiLYv35Y/q9neOs90UaPT7N8=
+github.com/raulk/go-bs-tests v0.0.3/go.mod h1:ZREaOSaReTvV4nY7Qh6Lkl+QisYXNBWcPRa0gjrIaG4=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0 h1:OdAsTTz6OkFY5QxjkYwrChwuRruF69c169dPK26NUlk=
 github.com/remyoudompheng/bigfft v0.0.0-20200410134404-eec4a21b6bb0/go.mod h1:qqbHyh8v60DhA7CoWK5oRCqLrMHRGoxYCSS9EjAz6Eo=
@@ -1774,6 +1777,8 @@ golang.org/x/sys v0.0.0-20200926100807-9d91bd62050c h1:38q6VNPWR010vN82/SB121Guj
 golang.org/x/sys v0.0.0-20200926100807-9d91bd62050c/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f h1:+Nyd8tzPX9R7BWHguqsrbFdRx3WQ/1ib8I44HXV5yTA=
 golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20201119102817-f84b799fce68 h1:nxC68pudNYkKU6jWhgrqdreuFiOQWj1Fs7T3VrH4Pjw=
+golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/text v0.0.0-20170915032832-14c0d48ead0c/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.0/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=
 golang.org/x/text v0.3.1-0.20180807135948-17ff2d5776d2/go.mod h1:NqM8EUOU14njkJ3fqMW+pc6Ldnwhi/IjpwHt7yyuwOQ=

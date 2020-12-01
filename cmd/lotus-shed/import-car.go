@@ -44,7 +44,7 @@ var importCarCmd = &cli.Command{
 			return xerrors.Errorf("opening the car file: %w", err)
 		}
 
-		bs, err := lr.Blockstore(repo.BlockstoreMonolith)
+		bs, err := lr.Blockstore(repo.ColdBlockstore)
 		if err != nil {
 			return err
 		}
@@ -113,7 +113,7 @@ var importObjectCmd = &cli.Command{
 		}
 		defer lr.Close() //nolint:errcheck
 
-		bs, err := lr.Blockstore(repo.BlockstoreMonolith)
+		bs, err := lr.Blockstore(repo.ColdBlockstore)
 		if err != nil {
 			return fmt.Errorf("failed to open blockstore: %w", err)
 		}

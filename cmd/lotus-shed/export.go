@@ -12,6 +12,7 @@ import (
 	"github.com/filecoin-project/go-state-types/abi"
 
 	"github.com/filecoin-project/lotus/chain/store"
+	"github.com/filecoin-project/lotus/chain/store/splitstore"
 	"github.com/filecoin-project/lotus/chain/types"
 	lcli "github.com/filecoin-project/lotus/cli"
 	"github.com/filecoin-project/lotus/node/repo"
@@ -72,7 +73,7 @@ var exportChainCmd = &cli.Command{
 
 		defer fi.Close() //nolint:errcheck
 
-		bs, err := lr.Blockstore(repo.BlockstoreMonolith)
+		bs, err := lr.Blockstore(repo.ColdBlockstore)
 		if err != nil {
 			return fmt.Errorf("failed to open blockstore: %w", err)
 		}
@@ -90,7 +91,18 @@ var exportChainCmd = &cli.Command{
 			return err
 		}
 
-		cs := store.NewChainStore(bs, bs, mds, nil, nil)
+		ssPath, err := lr.SplitstorePath()
+		if err != nil {
+			return err
+		}
+
+		ss, err := splitstore.NewSplitStore(ssPath, mds, bs)
+		if err != nil {
+			return err
+		}
+		defer ss.Close() //nolint:errcheck
+
+		cs := store.NewChainStore(ss, ss, mds, nil, nil)
 		defer cs.Close() //nolint:errcheck
 
 		if err := cs.Load(); err != nil {

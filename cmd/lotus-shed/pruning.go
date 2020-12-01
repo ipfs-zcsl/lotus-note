@@ -131,7 +131,7 @@ var stateTreePruneCmd = &cli.Command{
 
 		defer lkrepo.Close() //nolint:errcheck
 
-		bs, err := lkrepo.Blockstore(repo.BlockstoreMonolith)
+		bs, err := lkrepo.Blockstore(repo.ColdBlockstore)
 		if err != nil {
 			return fmt.Errorf("failed to open blockstore: %w", err)
 		}

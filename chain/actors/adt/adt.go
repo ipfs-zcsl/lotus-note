@@ -2,6 +2,7 @@ package adt
 
 import (
 	"github.com/ipfs/go-cid"
+	ipldcbor "github.com/ipfs/go-ipld-cbor"
 	"golang.org/x/xerrors"
 
 	"github.com/filecoin-project/go-state-types/abi"
@@ -46,6 +47,7 @@ func NewMap(store Store, version actors.Version) (Map, error) {
 
 type Array interface {
 	Root() (cid.Cid, error)
+	Store() ipldcbor.IpldStore
 
 	Set(idx uint64, v cbor.Marshaler) error
 	Get(idx uint64, v cbor.Unmarshaler) (bool, error)

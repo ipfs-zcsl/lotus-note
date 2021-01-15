@@ -2,6 +2,11 @@ package adt
 
 import (
 	"bytes"
+	"context"
+
+	"golang.org/x/xerrors"
+
+	"github.com/filecoin-project/go-amt-ipld/v2"
 
 	"github.com/filecoin-project/go-state-types/abi"
 	typegen "github.com/whyrusleeping/cbor-gen"
@@ -18,49 +23,46 @@ type AdtArrayDiff interface {
 	Remove(key uint64, val *typegen.Deferred) error
 }
 
-// TODO Performance can be improved by diffing the underlying IPLD graph, e.g. https://github.com/ipfs/go-merkledag/blob/749fd8717d46b4f34c9ce08253070079c89bc56d/dagutils/diff.go#L104
-// CBOR Marshaling will likely be the largest performance bottleneck here.
-
 // DiffAdtArray accepts two *adt.Array's and an AdtArrayDiff implementation. It does the following:
 // - All values that exist in preArr and not in curArr are passed to AdtArrayDiff.Remove()
 // - All values that exist in curArr nnd not in prevArr are passed to adtArrayDiff.Add()
 // - All values that exist in preArr and in curArr are passed to AdtArrayDiff.Modify()
-//  - It is the responsibility of AdtArrayDiff.Modify() to determine if the values it was passed have been modified.
 func DiffAdtArray(preArr, curArr Array, out AdtArrayDiff) error {
-	notNew := make(map[int64]struct{}, curArr.Length())
-	prevVal := new(typegen.Deferred)
-	if err := preArr.ForEach(prevVal, func(i int64) error {
-		curVal := new(typegen.Deferred)
-		found, err := curArr.Get(uint64(i), curVal)
-		if err != nil {
-			return err
-		}
-		if !found {
-			if err := out.Remove(uint64(i), prevVal); err != nil {
-				return err
-			}
-			return nil
-		}
-
-		// no modification
-		if !bytes.Equal(prevVal.Raw, curVal.Raw) {
-			if err := out.Modify(uint64(i), prevVal, curVal); err != nil {
-				return err
-			}
-		}
-		notNew[i] = struct{}{}
-		return nil
-	}); err != nil {
-		return err
+	preRoot, err := preArr.Root()
+	if err != nil {
+		return xerrors.Errorf("loading preRoot: %w", err)
 	}
 
-	curVal := new(typegen.Deferred)
-	return curArr.ForEach(curVal, func(i int64) error {
-		if _, ok := notNew[i]; ok {
-			return nil
+	curRoot, err := curArr.Root()
+	if err != nil {
+		return xerrors.Errorf("loading curRoot: %w", err)
+	}
+
+	changes, err := amt.Diff(context.TODO(), preArr.Store(), curArr.Store(), preRoot, curRoot)
+	if err != nil {
+		return xerrors.Errorf("getting changes: %w", err)
+	}
+
+	for _, c := range changes {
+		switch c.Type {
+		case amt.Add:
+			if err := out.Add(c.Key, c.After); err != nil {
+				return err
+			}
+
+		case amt.Remove:
+			if err := out.Remove(c.Key, c.Before); err != nil {
+				return err
+			}
+
+		case amt.Modify:
+			if err := out.Modify(c.Key, c.Before, c.After); err != nil {
+				return err
+			}
 		}
-		return out.Add(uint64(i), curVal)
-	})
+	}
+
+	return nil
 }
 
 // TODO Performance can be improved by diffing the underlying IPLD graph, e.g. https://github.com/ipfs/go-merkledag/blob/749fd8717d46b4f34c9ce08253070079c89bc56d/dagutils/diff.go#L104

@@ -170,8 +170,14 @@ func (a *StateAPI) StateMinerDeadlines(ctx context.Context, m address.Address, t
 			return err
 		}
 
+		l, err := dl.OptimisticPoStSubmissionsSnapshotLength()
+		if err != nil {
+			return err
+		}
+
 		out[i] = api.Deadline{
-			PostSubmissions: ps,
+			PostSubmissions:                         ps,
+			OptimisticPoStSubmissionsSnapshotLength: l,
 		}
 		return nil
 	}); err != nil {

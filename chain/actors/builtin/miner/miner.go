@@ -106,6 +106,7 @@ type Deadline interface {
 	PartitionsPoSted() (bitfield.BitField, error)
 
 	PartitionsChanged(Deadline) (bool, error)
+	OptimisticPoStSubmissionsSnapshotLength() (uint64, error)
 }
 
 type Partition interface {

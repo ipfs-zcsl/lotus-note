@@ -949,7 +949,8 @@ const (
 )
 
 type Deadline struct {
-	PostSubmissions bitfield.BitField
+	PostSubmissions                         bitfield.BitField
+	OptimisticPoStSubmissionsSnapshotLength uint64
 }
 
 type Partition struct {

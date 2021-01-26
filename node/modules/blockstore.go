@@ -53,40 +53,42 @@ func SplitBlockstore(lc fx.Lifecycle, r repo.LockedRepo, ds dtypes.MetadataDS, b
 
 // StateBlockstore returns the blockstore to use to store the state tree.
 func StateBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.SplitBlockstore) (dtypes.StateBlockstore, error) {
-	sbs, err := blockstore.WrapFreecacheCache(helpers.LifecycleCtx(mctx, lc), bs, blockstore.FreecacheConfig{
-		Name:           "state",
-		BlockCapacity:  288 * 1024 * 1024, // 288MiB.
-		ExistsCapacity: 48 * 1024 * 1024,  // 48MiB.
-	})
-	if err != nil {
-		return nil, err
-	}
-	// this may end up double closing the underlying blockstore, but all
-	// blockstores should be lenient or idempotent on double-close. The native
-	// badger blockstore is (and unit tested).
-	if c, ok := bs.(io.Closer); ok {
-		lc.Append(closerStopHook(c))
-	}
-	return sbs, nil
+	// sbs, err := blockstore.WrapFreecacheCache(helpers.LifecycleCtx(mctx, lc), bs, blockstore.FreecacheConfig{
+	// 	Name:           "state",
+	// 	BlockCapacity:  288 * 1024 * 1024, // 288MiB.
+	// 	ExistsCapacity: 48 * 1024 * 1024,  // 48MiB.
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// // this may end up double closing the underlying blockstore, but all
+	// // blockstores should be lenient or idempotent on double-close. The native
+	// // badger blockstore is (and unit tested).
+	// if c, ok := bs.(io.Closer); ok {
+	// 	lc.Append(closerStopHook(c))
+	// }
+	// return sbs, nil
+	return bs, nil
 }
 
 // ChainBlockstore returns the blockstore to use for chain data (tipsets, blocks, messages).
 func ChainBlockstore(lc fx.Lifecycle, mctx helpers.MetricsCtx, bs dtypes.SplitBlockstore) (dtypes.ChainBlockstore, error) {
-	cbs, err := blockstore.WrapFreecacheCache(helpers.LifecycleCtx(mctx, lc), bs, blockstore.FreecacheConfig{
-		Name:           "chain",
-		BlockCapacity:  64 * 1024 * 1024, // 64MiB.
-		ExistsCapacity: 16 * 1024,        // 16MiB.
-	})
-	if err != nil {
-		return nil, err
-	}
-	// this may end up double closing the underlying blockstore, but all
-	// blockstores should be lenient or idempotent on double-close. The native
-	// badger blockstore is (and unit tested).
-	if c, ok := bs.(io.Closer); ok {
-		lc.Append(closerStopHook(c))
-	}
-	return cbs, nil
+	// cbs, err := blockstore.WrapFreecacheCache(helpers.LifecycleCtx(mctx, lc), bs, blockstore.FreecacheConfig{
+	// 	Name:           "chain",
+	// 	BlockCapacity:  64 * 1024 * 1024, // 64MiB.
+	// 	ExistsCapacity: 16 * 1024,        // 16MiB.
+	// })
+	// if err != nil {
+	// 	return nil, err
+	// }
+	// // this may end up double closing the underlying blockstore, but all
+	// // blockstores should be lenient or idempotent on double-close. The native
+	// // badger blockstore is (and unit tested).
+	// if c, ok := bs.(io.Closer); ok {
+	// 	lc.Append(closerStopHook(c))
+	// }
+	// return cbs, nil
+	return bs, nil
 }
 
 func FallbackChainBlockstore(cbs dtypes.ChainBlockstore) dtypes.ChainBlockstore {

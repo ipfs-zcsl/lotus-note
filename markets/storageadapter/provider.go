@@ -11,20 +11,20 @@ import (
 	logging "github.com/ipfs/go-log/v2"
 	"golang.org/x/xerrors"
 
-	market2 "github.com/filecoin-project/specs-actors/v2/actors/builtin/market"
-
 	"github.com/filecoin-project/go-address"
 	"github.com/filecoin-project/go-fil-markets/shared"
 	"github.com/filecoin-project/go-fil-markets/storagemarket"
 	"github.com/filecoin-project/go-state-types/abi"
 	"github.com/filecoin-project/go-state-types/crypto"
 	"github.com/filecoin-project/go-state-types/exitcode"
+	"github.com/filecoin-project/lotus/chain/events/state"
+	market0 "github.com/filecoin-project/specs-actors/actors/builtin/market"
+	market2 "github.com/filecoin-project/specs-actors/v2/actors/builtin/market"
 
 	"github.com/filecoin-project/lotus/api"
 	"github.com/filecoin-project/lotus/build"
 	"github.com/filecoin-project/lotus/chain/actors/builtin/market"
 	"github.com/filecoin-project/lotus/chain/events"
-	"github.com/filecoin-project/lotus/chain/events/state"
 	"github.com/filecoin-project/lotus/chain/types"
 	sealing "github.com/filecoin-project/lotus/extern/storage-sealing"
 	"github.com/filecoin-project/lotus/lib/sigs"
@@ -50,8 +50,8 @@ type ProviderNodeAdapter struct {
 	dealPublisher *DealPublisher
 
 	addBalanceSpec *api.MessageSendSpec
-	dsMatcher      *dealStateMatcher
 	scMgr          *SectorCommittedManager
+	deMgr          *DealExpiryManager
 }
 
 func NewProviderNodeAdapter(fc *config.MinerFeeConfig) func(dag dtypes.StagingDAG, secb *sectorblocks.SectorBlocks, full api.FullNode, dealPublisher *DealPublisher) storagemarket.StorageProviderNode {
@@ -64,12 +64,14 @@ func NewProviderNodeAdapter(fc *config.MinerFeeConfig) func(dag dtypes.StagingDA
 			secb:          secb,
 			ev:            ev,
 			dealPublisher: dealPublisher,
-			dsMatcher:     newDealStateMatcher(state.NewStatePredicates(state.WrapFastAPI(full))),
 		}
 		if fc != nil {
 			na.addBalanceSpec = &api.MessageSendSpec{MaxFee: abi.TokenAmount(fc.MaxMarketBalanceAddFee)}
 		}
 		na.scMgr = NewSectorCommittedManager(ev, na, &apiWrapper{api: full})
+
+		dsMatcher := newDealStateMatcher(state.NewStatePredicates(state.WrapFastAPI(full)))
+		na.deMgr = NewDealExpiryManager(ev, full, full, dsMatcher)
 
 		return na
 	}
@@ -287,93 +289,8 @@ func (n *ProviderNodeAdapter) GetDataCap(ctx context.Context, addr address.Addre
 	return sp, err
 }
 
-func (n *ProviderNodeAdapter) OnDealExpiredOrSlashed(ctx context.Context, dealID abi.DealID, onDealExpired storagemarket.DealExpiredCallback, onDealSlashed storagemarket.DealSlashedCallback) error {
-	head, err := n.ChainHead(ctx)
-	if err != nil {
-		return xerrors.Errorf("client: failed to get chain head: %w", err)
-	}
-
-	sd, err := n.StateMarketStorageDeal(ctx, dealID, head.Key())
-	if err != nil {
-		return xerrors.Errorf("client: failed to look up deal %d on chain: %w", dealID, err)
-	}
-
-	// Called immediately to check if the deal has already expired or been slashed
-	checkFunc := func(ts *types.TipSet) (done bool, more bool, err error) {
-		if ts == nil {
-			// keep listening for events
-			return false, true, nil
-		}
-
-		// Check if the deal has already expired
-		if sd.Proposal.EndEpoch <= ts.Height() {
-			onDealExpired(nil)
-			return true, false, nil
-		}
-
-		// If there is no deal assume it's already been slashed
-		if sd.State.SectorStartEpoch < 0 {
-			onDealSlashed(ts.Height(), nil)
-			return true, false, nil
-		}
-
-		// No events have occurred yet, so return
-		// done: false, more: true (keep listening for events)
-		return false, true, nil
-	}
-
-	// Called when there was a match against the state change we're looking for
-	// and the chain has advanced to the confidence height
-	stateChanged := func(ts *types.TipSet, ts2 *types.TipSet, states events.StateChange, h abi.ChainEpoch) (more bool, err error) {
-		// Check if the deal has already expired
-		if ts2 == nil || sd.Proposal.EndEpoch <= ts2.Height() {
-			onDealExpired(nil)
-			return false, nil
-		}
-
-		// Timeout waiting for state change
-		if states == nil {
-			log.Error("timed out waiting for deal expiry")
-			return false, nil
-		}
-
-		changedDeals, ok := states.(state.ChangedDeals)
-		if !ok {
-			panic("Expected state.ChangedDeals")
-		}
-
-		deal, ok := changedDeals[dealID]
-		if !ok {
-			// No change to deal
-			return true, nil
-		}
-
-		// Deal was slashed
-		if deal.To == nil {
-			onDealSlashed(ts2.Height(), nil)
-			return false, nil
-		}
-
-		return true, nil
-	}
-
-	// Called when there was a chain reorg and the state change was reverted
-	revert := func(ctx context.Context, ts *types.TipSet) error {
-		// TODO: Is it ok to just ignore this?
-		log.Warn("deal state reverted; TODO: actually handle this!")
-		return nil
-	}
-
-	// Watch for state changes to the deal
-	match := n.dsMatcher.matcher(ctx, dealID)
-
-	// Wait until after the end epoch for the deal and then timeout
-	timeout := (sd.Proposal.EndEpoch - head.Height()) + 1
-	if err := n.ev.StateChanged(checkFunc, stateChanged, revert, int(build.MessageConfidence)+1, timeout, match); err != nil {
-		return xerrors.Errorf("failed to set up state changed handler: %w", err)
-	}
-
-	return nil
+func (n *ProviderNodeAdapter) OnDealExpiredOrSlashed(ctx context.Context, publishCid cid.Cid, proposal market0.DealProposal, onDealExpired storagemarket.DealExpiredCallback, onDealSlashed storagemarket.DealSlashedCallback) error {
+	return n.deMgr.OnDealExpiredOrSlashed(ctx, publishCid, proposal, onDealExpired, onDealSlashed)
 }
 
 var _ storagemarket.StorageProviderNode = &ProviderNodeAdapter{}

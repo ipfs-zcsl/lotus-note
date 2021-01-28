@@ -2,7 +2,6 @@ package modules
 
 import (
 	"context"
-	"io"
 	"time"
 
 	"github.com/ipfs/go-bitswap"
@@ -160,12 +159,4 @@ func NewSyncer(params SyncerParams) (*chain.Syncer, error) {
 
 func NewSlashFilter(ds dtypes.MetadataDS) *slashfilter.SlashFilter {
 	return slashfilter.New(ds)
-}
-
-func closerStopHook(c io.Closer) fx.Hook {
-	return fx.Hook{
-		OnStop: func(_ context.Context) error {
-			return c.Close()
-		},
-	}
 }

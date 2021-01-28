@@ -1316,8 +1316,6 @@ github.com/prometheus/procfs v0.1.0 h1:jhMy6QXfi3y2HEzFoyuCj40z4OZIIHHPtFyCMftmv
 github.com/prometheus/procfs v0.1.0/go.mod h1:lV6e/gmhEcM9IjHGsFOCxxuZ+z1YqCvr4OA4YeYWdaU=
 github.com/raulk/clock v1.1.0 h1:dpb29+UKMbLqiU/jqIJptgLR1nn23HLgMY0sTCDza5Y=
 github.com/raulk/clock v1.1.0/go.mod h1:3MpVxdZ/ODBQDxbN+kzshf5OSZwPjtMDx6BBXBmOeY0=
-github.com/raulk/freecache v1.2.0 h1:1HDmZsDi+zvFe1/vMLkdrX9ThWdXQsIp4btrGJ824yc=
-github.com/raulk/freecache v1.2.0/go.mod h1:Ixh8xigQnoxRDvSTzugeiLYv35Y/q9neOs90UaPT7N8=
 github.com/raulk/go-bs-tests v0.0.4 h1:gYUYmIFMBnp2mtZQuiP/ZGtSTSPvmDBjWBz0xTZz4X8=
 github.com/raulk/go-bs-tests v0.0.4/go.mod h1:ZREaOSaReTvV4nY7Qh6Lkl+QisYXNBWcPRa0gjrIaG4=
 github.com/raulk/go-watchdog v1.0.1 h1:qgm3DIJAeb+2byneLrQJ7kvmDLGxN2vy3apXyGaDKN4=

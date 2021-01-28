@@ -39,6 +39,7 @@ func main() {
 		mathCmd,
 		mpoolStatsCmd,
 		exportChainCmd,
+		exportCarCmd,
 		consensusCmd,
 		rollupDealStatsCmd,
 		syncCmd,

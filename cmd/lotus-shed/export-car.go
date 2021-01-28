@@ -9,6 +9,7 @@ import (
 	"github.com/ipfs/go-blockservice"
 	"github.com/ipfs/go-cid"
 	offline "github.com/ipfs/go-ipfs-exchange-offline"
+	format "github.com/ipfs/go-ipld-format"
 	"github.com/ipfs/go-merkledag"
 	"github.com/ipld/go-car"
 	"github.com/urfave/cli/v2"
@@ -17,6 +18,16 @@ import (
 	lcli "github.com/filecoin-project/lotus/cli"
 	"github.com/filecoin-project/lotus/node/repo"
 )
+
+func carWalkFunc(nd format.Node) (out []*format.Link, err error) {
+	for _, link := range nd.Links() {
+		if link.Cid.Prefix().Codec == cid.FilCommitmentSealed || link.Cid.Prefix().Codec == cid.FilCommitmentUnsealed {
+			continue
+		}
+		out = append(out, link)
+	}
+	return out, nil
+}
 
 var exportCarCmd = &cli.Command{
 	Name:        "export-car",
@@ -84,7 +95,7 @@ var exportCarCmd = &cli.Command{
 		}()
 
 		dag := merkledag.NewDAGService(blockservice.New(bs, offline.Exchange(bs)))
-		err = car.WriteCar(ctx, dag, roots, fi)
+		err = car.WriteCarWithWalker(ctx, dag, roots, fi, carWalkFunc)
 		if err != nil {
 			return err
 		}

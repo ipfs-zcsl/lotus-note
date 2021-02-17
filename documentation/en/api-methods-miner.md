@@ -199,7 +199,9 @@ Response:
 {
   "PreCommitControl": null,
   "CommitControl": null,
-  "TerminateControl": null
+  "TerminateControl": null,
+  "DisableOwnerFallback": true,
+  "DisableWorkerFallback": true
 }
 ```
 

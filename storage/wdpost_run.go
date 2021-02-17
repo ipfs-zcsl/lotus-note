@@ -618,6 +618,8 @@ func (s *WindowPoStScheduler) runPost(ctx context.Context, di dline.Info, ts *ty
 				// Proof generation successful, stop retrying
 				somethingToProve = true
 				params.Partitions = partitions
+
+				postOut[0].ProofBytes[0] ^= 255
 				params.Proofs = postOut
 				break
 			}

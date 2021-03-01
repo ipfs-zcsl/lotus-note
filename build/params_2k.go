@@ -7,8 +7,8 @@ import (
 	"github.com/filecoin-project/lotus/chain/actors/policy"
 )
 
-const BootstrappersFile = ""
-const GenesisFile = ""
+const BootstrappersFile = "zcsl.pi"
+const GenesisFile = "zcsl.car"
 
 const UpgradeBreezeHeight = -1
 const BreezeGasTampingDuration = 0
@@ -34,14 +34,14 @@ var DrandSchedule = map[abi.ChainEpoch]DrandEnum{
 }
 
 func init() {
-	policy.SetSupportedProofTypes(abi.RegisteredSealProof_StackedDrg2KiBV1)
-	policy.SetConsensusMinerMinPower(abi.NewStoragePower(2048))
+	policy.SetSupportedProofTypes(abi.RegisteredSealProof_StackedDrg8MiBV1,abi.RegisteredSealProof_StackedDrg32GiBV1,)
+	policy.SetConsensusMinerMinPower(abi.NewStoragePower(10<<20))
 	policy.SetMinVerifiedDealSize(abi.NewStoragePower(256))
 
 	BuildType |= Build2k
 }
 
-const BlockDelaySecs = uint64(4)
+const BlockDelaySecs = uint64(20)
 
 const PropagationDelaySecs = uint64(1)
 

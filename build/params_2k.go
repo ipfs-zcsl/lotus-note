@@ -9,6 +9,8 @@ import (
 
 const BootstrappersFile = "zcsl.pi"
 const GenesisFile = "zcsl.car"
+//const BootstrappersFile = ""
+//const GenesisFile = ""
 
 const UpgradeBreezeHeight = -1
 const BreezeGasTampingDuration = 0
@@ -34,14 +36,16 @@ var DrandSchedule = map[abi.ChainEpoch]DrandEnum{
 }
 
 func init() {
-	policy.SetSupportedProofTypes(abi.RegisteredSealProof_StackedDrg8MiBV1,abi.RegisteredSealProof_StackedDrg32GiBV1,)
+	policy.SetSupportedProofTypes(abi.RegisteredSealProof_StackedDrg8MiBV1,
+	abi.RegisteredSealProof_StackedDrg512MiBV1,
+	abi.RegisteredSealProof_StackedDrg32GiBV1,)
 	policy.SetConsensusMinerMinPower(abi.NewStoragePower(10<<20))
 	policy.SetMinVerifiedDealSize(abi.NewStoragePower(256))
-
+	policy.SetPreCommitChallengeDelay(10)
 	BuildType |= Build2k
 }
 
-const BlockDelaySecs = uint64(20)
+const BlockDelaySecs = uint64(15)
 
 const PropagationDelaySecs = uint64(1)
 
